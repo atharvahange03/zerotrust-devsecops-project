@@ -144,13 +144,20 @@ pipeline {
             }
         }
 
-        stage('Helm Deploy') {
-            steps {
-                withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    sh "helm upgrade --install ztso ${WORKSPACE}/k8s/helm/ztso --namespace ztso-app --set image.tag=${IMAGE_TAG} --kubeconfig \$KUBECONFIG"
-                }
-            }
-        }
+       stage('Update Image Tag') {
+    steps {
+        sh """
+            sed -i 's|tag:.*|tag: "${IMAGE_TAG}"|g' k8s/argocd/values-override.yaml
+        """
+        sh """
+            git config user.email "jenkins@ztso.local"
+            git config user.name "Jenkins"
+            git add k8s/argocd/values-override.yaml
+            git diff --staged --quiet || git commit -m "Update image tag to ${IMAGE_TAG} [skip ci]"
+            git push origin ztso-devops
+        """
+    }
+}
 
     }
 
