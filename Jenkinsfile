@@ -144,18 +144,24 @@ pipeline {
             }
         }
 
-       stage('Update Image Tag') {
+stage('Update Image Tag') {
     steps {
-        sh """
-            sed -i 's|tag:.*|tag: "${IMAGE_TAG}"|g' k8s/argocd/values-override.yaml
-        """
-        sh """
-            git config user.email "jenkins@ztso.local"
-            git config user.name "Jenkins"
-            git add k8s/argocd/values-override.yaml
-            git diff --staged --quiet || git commit -m "Update image tag to ${IMAGE_TAG} [skip ci]"
-            git push origin ztso-devops
-        """
+        withCredentials([usernamePassword(
+            credentialsId: 'gitCredentials',
+            usernameVariable: 'GIT_USER',
+            passwordVariable: 'GIT_TOKEN'
+        )]) {
+            sh """
+                git config user.email "jenkins@ztso.local"
+                git config user.name "Jenkins"
+                git checkout ztso-devops
+                git pull origin ztso-devops
+                sed -i 's|tag:.*|tag: "${IMAGE_TAG}"|g' k8s/argocd/values-override.yaml
+                git add k8s/argocd/values-override.yaml
+                git diff --staged --quiet || git commit -m "Update image tag to ${IMAGE_TAG} [skip ci]"
+                git push https://\${GIT_USER}:\${GIT_TOKEN}@github.com/atharvahange03/zerotrust-devsecops-project.git ztso-devops
+            """
+        }
     }
 }
 
