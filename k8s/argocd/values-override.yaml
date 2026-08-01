@@ -1,5 +1,5 @@
 backend:
-  tag: "latest"
+  tag: "3386c62"
 
 frontend:
-  tag: "latest"
+  tag: "3386c62"
