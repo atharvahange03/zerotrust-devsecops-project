@@ -1,0 +1,5 @@
+backend:
+  tag: "latest"
+
+frontend:
+  tag: "latest"
