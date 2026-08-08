@@ -27,7 +27,7 @@ pipeline {
         stage('Gitleaks - Secret Scan') {
             steps {
                 sh 'rm -rf .scannerwork'
-                sh 'rm -f gitleaks-report.json trivy-backend-report.json trivy-frontend-report.json trivy-fs-report.json'
+                sh 'rm -f gitleaks-report.json trivy-backend-report.json trivy-frontend-report.json trivy-fs-report.json trivy-backend-high-report.json trivy-frontend-high-report.json'
                 sh '''
                     gitleaks detect \
                         --source . \
