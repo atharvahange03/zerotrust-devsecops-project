@@ -124,24 +124,16 @@ pipeline {
         }
 
         stage('Cosign - Image Sign') {
-            steps {
-                withCredentials([
-                    file(credentialsId: 'cosign-private-key', variable: 'COSIGN_KEY'),
-                    string(credentialsId: 'cosign-password', variable: 'COSIGN_PASSWORD')
-                ]) {
-                    sh """
-                        cosign sign --key \$COSIGN_KEY \
-                            -a "pipeline=jenkins" \
-                            -a "commit=${IMAGE_TAG}" \
-                            ${IMAGE_NAME_BACKEND}:${IMAGE_TAG} --yes
-                        cosign sign --key \$COSIGN_KEY \
-                            -a "pipeline=jenkins" \
-                            -a "commit=${IMAGE_TAG}" \
-                            ${IMAGE_NAME_FRONTEND}:${IMAGE_TAG} --yes
-                    """
-                }
-            }
+    steps {
+        withCredentials([
+            file(credentialsId: 'cosign-private-key', variable: 'COSIGN_KEY'),
+            string(credentialsId: 'cosign-password', variable: 'COSIGN_PASSWORD')
+        ]) {
+            sh "cosign sign --key \$COSIGN_KEY -a pipeline=jenkins -a commit=${IMAGE_TAG} ${IMAGE_NAME_BACKEND}:${IMAGE_TAG} --yes"
+            sh "cosign sign --key \$COSIGN_KEY -a pipeline=jenkins -a commit=${IMAGE_TAG} ${IMAGE_NAME_FRONTEND}:${IMAGE_TAG} --yes"
         }
+    }
+}
 
         stage('Update Image Tag') {
             steps {
