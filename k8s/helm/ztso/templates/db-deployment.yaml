@@ -39,8 +39,7 @@ spec:
             allowPrivilegeEscalation: false
       volumes:
         - name: db-storage
-          persistentVolumeClaim:
-            claimName: db-pvc
+          emptyDir: {}
         - name: initdb
           configMap:
             name: db-initdb
